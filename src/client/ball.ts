@@ -6,8 +6,9 @@ import { generateCircleTexture } from "./utils";
 export class PaintBall extends PIXI.Sprite{
     private moveManager: SmoothMoveManager;
     constructor(private client: GameAppClient, x: number, y: number, attrs: any) {
-        super(generateCircleTexture(client.renderer, 0x00FF00, 5))
+        super(generateCircleTexture(client.renderer, 0x00FF00, attrs.radius))
         this.position.set(x, y);
+        this.anchor.set(0.5, 0.5);
         this.moveManager = new SmoothMoveManager({ x, y });
         this.moveManager.on("newPos", ({x, y}) => {
             this.position.set(x, y);

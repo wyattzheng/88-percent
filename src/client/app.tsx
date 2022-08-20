@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import { TileRenderer } from "@pixi/tilemap";
 import React from "react";
 import io, { Socket } from "socket.io-client"
 import { World } from "./world";
@@ -34,6 +35,7 @@ export class GameAppClient extends EventEmitter{
         this.gameApp.ticker.add(() => {
             this.world?.update();
         });
+        this.gameApp.renderer.plugins.tilemap = new TileRenderer(this.renderer);
     }
 
     get renderer() {

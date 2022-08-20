@@ -23,7 +23,7 @@ export class GameAppServer{
                 room.world?.update();
             });
             const end = new Date().getTime();
-            await wait(Math.max(30 - (end - start), 0));
+            await wait(Math.max(50 - (end - start), 0));
         }
     }
 

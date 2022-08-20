@@ -112,8 +112,8 @@ export class SmoothMoveManager extends EventEmitter implements MoveManager{
 		const offsetX = this.state.x - this.targetState.x;
 		const offsetY = this.state.y - this.targetState.y;
 
-		this.state.x += -offsetX / CORRECTION_RATIO;
-		this.state.y += -offsetY / CORRECTION_RATIO;
+		this.state.x += -offsetX / 3;
+		this.state.y += -offsetY / 3;
 
 		this.applyState(this.state);
 	}

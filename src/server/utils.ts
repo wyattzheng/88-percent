@@ -50,3 +50,74 @@ export class Vector2 {
         return new Vector2(Math.cos(rad), Math.sin(rad));
     }
 }
+
+export function getPointsSegmentInRect(segA: Vector2, segB: Vector2, minX: number, maxX: number, minY: number, maxY: number): Vector2[] {
+    const points: Vector2[] = [];
+
+	if (segB.x === segA.x) {
+		const mnY = Math.min(segA.y, segB.y);
+		const mxY = Math.max(segA.y, segB.y);
+		if (!(segA.x >= minX && segA.x < maxX)) {
+			return [];
+		}
+		if (minY >= mnY && minY < mxY) {
+			points.push(new Vector2(segA.x, minY))
+		}
+		if (maxY >= mnY && maxY < mxY) {
+			points.push(new Vector2(segA.x, maxY))
+		}
+		return points;
+	}
+
+	if (segB.y === segA.y) {
+		const mnX = Math.min(segA.x, segB.x);
+		const mxX = Math.max(segA.x, segB.x);
+		if (!(segA.y >= minY && segA.y < maxY)) {
+			return [];
+		}
+		if (minX >= mnX && minX < mxX) {
+			points.push(new Vector2(minX, segA.y))
+		}
+		if (maxX >= mnX && maxX < mxX) {
+			points.push(new Vector2(maxX, segA.y))
+		}
+		return points;
+	}
+
+
+    const k = (segB.y - segA.y) / (segB.x - segA.x); // k = tan(x)
+    const b = segA.y - k * segA.x; // b = y1 - k * x1
+
+    const y1 = k * minX + b;
+    if (minY <= y1 && y1 < maxY) {
+        points.push(new Vector2(minX, y1));
+    }
+
+    const y2 = k * maxX + b;
+    if (minY <= y2 && y2 < maxY) {
+        points.push(new Vector2(maxX, y2));
+    }
+
+    // x = (y - b) / k
+    const x1 = (minY - b) / k;
+    if (minX <= x1 && x1 < maxX) {
+        points.push(new Vector2(x1, minY));
+    }
+
+    const x2 = (maxY - b) / k;
+    if (minX <= x2 && x2 < maxX) {
+        points.push(new Vector2(x2, maxY));
+    }
+
+    return points;
+}
+
+export function getFirstPointInSegment(segA: Vector2, segB: Vector2, points: Vector2[]) {
+	if (points.length <= 0) {
+		return;
+	}
+	if (segA.x === segB.x) {
+		return points.sort((a, b) => (Math.abs(a.y - segA.y) - Math.abs(b.y - segA.y)))[0];
+	}
+	return points.sort((a, b) => (Math.abs(a.x - segA.x) - Math.abs(b.x - segA.x)))[0];
+}

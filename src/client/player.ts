@@ -29,9 +29,11 @@ export class Player extends PIXI.Container{
         })
         this.position.set(x, y);
 
+        this.radius = attrs.radius;
         this.sprite = new PIXI.Sprite(generateCircleTexture(this.client.renderer, attrs.color, this.radius));
-        this.sprite.width = this.radius;
-        this.sprite.height = this.radius;
+        this.sprite.width = this.radius * 2;
+        this.sprite.height = this.radius * 2;
+        this.sprite.anchor.set(0.5, 0.5);
         this.addChild(this.sprite);
 
         const nameText = new PIXI.Text(attrs.name, new PIXI.TextStyle({ fontSize: 12, fill: "#FFF" }));

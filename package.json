@@ -26,6 +26,7 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "@pixi/tilemap": "^3.2.2",
     "eventemitter3": "^4.0.7",
     "keyboardjs": "^2.6.4",
     "nodemon": "^2.0.19",

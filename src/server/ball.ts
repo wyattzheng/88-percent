@@ -9,6 +9,7 @@ import { World } from "./world";
 export class PaintBall extends Entity{
     private direction: number; // [0, 2pi] rad
     private speed: number; // distance per tick
+    private radius = 5;
     constructor(direction: number, speed: number, x: number, y: number, world: World) {
         super(x, y, world);
         this.direction = direction;
@@ -25,18 +26,18 @@ export class PaintBall extends Entity{
         const yVec = new Vector2(0, 1);
 
         const halfPi = Math.PI / 2;
-        if (newY < 0) { // 与上边缘相碰
+        if (newY < this.radius) { // 与上边缘相碰
             newDirection = dirVec.reflect(xVec.vertical()).rad();
-            newY = 1;
-        } else if (newY > this.world.height) {
+            newY = this.radius;
+        } else if (newY > this.world.height - this.radius) {
             newDirection = dirVec.reflect(xVec.vertical()).rad();
-            newY = this.world.height
-        } else if (newX < 0) {
+            newY = this.world.height - this.radius
+        } else if (newX < this.radius) {
             newDirection = dirVec.reflect(yVec.vertical()).rad();
-            newX = 0;
-        } else if (newX > this.world.width) {
+            newX = this.radius;
+        } else if (newX > this.world.width - this.radius) {
             newDirection = dirVec.reflect(yVec.vertical()).rad();
-            newX = this.world.width;
+            newX = this.world.width - this.radius;
         }
 
         this.direction = newDirection;
@@ -45,8 +46,18 @@ export class PaintBall extends Entity{
         this.y = newY;
     }
 
+    private updatePaint() {
+        this.world.panel.paintColorLine(0x0000FF, new Vector2(this.lastX, this.lastY) , new Vector2(this.x, this.y));
+    }
+
+    protected updateAttrs(): void {
+        super.updateAttrs();
+        this.attrs.set("radius", this.radius);
+    }
+
     update(): void {
         super.update();
         this.updateMove();
+        this.updatePaint();
     }
 }

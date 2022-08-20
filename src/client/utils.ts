@@ -8,3 +8,11 @@ export function generateCircleTexture(renderer: Renderer, color: number, radius:
     gr.endFill();
     return renderer.generateTexture(gr);
 }
+
+export function generateRectTexture(renderer: Renderer, color: number, width: number) {
+    const gr = new PIXI.Graphics();
+    gr.beginFill(color);
+    gr.drawRect(0, 0, width, width);
+    gr.endFill();
+    return renderer.generateTexture(gr);
+}

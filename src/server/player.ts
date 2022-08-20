@@ -75,6 +75,7 @@ export class LobbyPlayer{
 export class Player extends Entity{
     private lastMoveInputId: number = 0;
     private forceReportMove: boolean = false;
+    private radius = 20;
 
     constructor(private lobbyPlayer: LobbyPlayer, x: number, y: number, private color: number, world: World) {
         super(x, y, world);
@@ -89,10 +90,10 @@ export class Player extends Entity{
 
         const newX = this.x + x;
         const newY = this.y + y;
-        if (newX > this.world.width || newX < 0) {
+        if (newX > this.world.width - this.radius || newX < this.radius) {
             return;
         }
-        if (newY > this.world.height || newY < 0) {
+        if (newY > this.world.height - this.radius || newY < this.radius) {
             return;
         }
 
@@ -100,10 +101,15 @@ export class Player extends Entity{
         this.y = newY;
     }
 
+    getColor() {
+        return this.color;
+    }
+
     updateAttrs() {
         this.attrs.set("id", this.id);
         this.attrs.set("name", this.lobbyPlayer.getName()),
         this.attrs.set("color", this.color);
+        this.attrs.set("radius", this.radius);
     }
 
     updateBroadcastMove(): void {
