@@ -1,5 +1,5 @@
 # 88%
 
-a game named 88-percent
+🎮 a multi-player game named 88-percent
 
 🚧 under construction...
