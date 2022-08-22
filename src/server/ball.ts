@@ -10,7 +10,7 @@ export class PaintBall extends Entity{
     private direction: number; // [0, 2pi] rad
     private speed: number; // distance per tick
     private radius = 5;
-    constructor(direction: number, speed: number, x: number, y: number, world: World) {
+    constructor(public paintColor: number, direction: number, speed: number, x: number, y: number, world: World) {
         super(x, y, world);
         this.direction = direction;
         this.speed = speed;
@@ -25,7 +25,6 @@ export class PaintBall extends Entity{
         const xVec = new Vector2(1, 0);
         const yVec = new Vector2(0, 1);
 
-        const halfPi = Math.PI / 2;
         if (newY < this.radius) { // 与上边缘相碰
             newDirection = dirVec.reflect(xVec.vertical()).rad();
             newY = this.radius;
@@ -47,7 +46,7 @@ export class PaintBall extends Entity{
     }
 
     private updatePaint() {
-        this.world.panel.paintColorLine(0x0000FF, new Vector2(this.lastX, this.lastY) , new Vector2(this.x, this.y));
+        this.world.panel.paintColorLine(this.paintColor, new Vector2(this.lastX, this.lastY) , new Vector2(this.x, this.y));
     }
 
     protected updateAttrs(): void {

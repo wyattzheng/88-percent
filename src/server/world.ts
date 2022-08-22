@@ -9,11 +9,11 @@ export type Color = number;
 
 export class Panel{
     private colorMap: (Color | null)[][] = [];
-    private width: number;
-    private height: number;
+    public readonly width: number;
+    public readonly height: number;
     constructor(private colors: Color[], private world: World) {
-        this.width = world.width / world.tileWidth;
-        this.height = world.height / world.tileWidth;
+        this.width = Math.floor(world.width / world.tileWidth);
+        this.height = Math.floor(world.height / world.tileWidth);
         this.initMap();
     }
     private initMap() {
@@ -63,8 +63,8 @@ export class World{
     public panel: Panel;
     public readonly tileWidth = 5;
     
-    public readonly width = 600;
-    public readonly height = 400;
+    public readonly width = 1200;
+    public readonly height = 600;
 
     constructor(private pA: LobbyPlayer, private pB: LobbyPlayer, public room: Room) {
         this.server = room.server;
@@ -82,12 +82,13 @@ export class World{
         this.players = [this.playerA, this.playerB];
         const colors = this.players.map((player) => player.getColor());
         this.panel = new Panel(colors, this);
-        this.broadcast("reset-world", colors,this.tileWidth);
+        this.broadcast("reset-world", colors, this.tileWidth, this.panel.width, this.panel.height);
         this.players.forEach((player) => {
             this.addEntity(player);
         })
 
-        this.addEntity(new PaintBall(Math.PI * 3.5 / 2, 20, 50, 50, this));
+        this.addEntity(new PaintBall(0x0000FF, Math.PI * 3.2 / 2, 20, 50, 50, this));
+        this.addEntity(new PaintBall(0xFF0000, Math.PI * 3.6 / 2, 20, 50, 50, this));
         this.resetCoins();
     }
 

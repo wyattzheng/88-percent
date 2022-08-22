@@ -29,8 +29,8 @@ export class GameAppClient extends EventEmitter{
     }
     private initGameApp() {
         this.gameApp = new PIXI.Application({
-            width: 600,
-            height: 400,
+            width: 1200,
+            height: 600,
         });
         this.gameApp.ticker.add(() => {
             this.world?.update();

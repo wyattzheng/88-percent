@@ -2,8 +2,7 @@ import * as PIXI from "pixi.js";
 import { GameAppClient } from "./app";
 import { PaintBall } from "./ball";
 import { Player } from "./player";
-import { CompositeRectTileLayer } from "@pixi/tilemap";
-import { generateCircleTexture } from "./utils";
+import { colorNumToStr } from "./utils";
 
 interface Updateable extends PIXI.DisplayObject {
     update?(): void;
@@ -11,40 +10,47 @@ interface Updateable extends PIXI.DisplayObject {
 
 export const entityFactory = [Player, PaintBall];
 
-export class Panel extends CompositeRectTileLayer{
-    private colors = new Map<number, PIXI.Texture>();
+export class Panel extends PIXI.Sprite{
+    private colors: PIXI.Texture[] = [];
     private tick = 0;
     private queuedTiles = [];
-    constructor(colors: number[], private tileWidth: number, private world: World) {
-        super();
-        for(const color of colors) {
-            this.colors.set(color, generateCircleTexture(world.renderer, color, tileWidth ));
-        }
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D;
+    constructor(colors: number[], private tileWidth: number, width: number, height: number, private world: World) {
+        super(PIXI.Texture.WHITE);
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = tileWidth * width;
+        this.canvas.height = tileWidth * height;
+        this.texture = PIXI.Texture.from(this.canvas);
+        this.ctx = this.canvas.getContext("2d");
     }
 
     paint(color: number, ix: number, iy: number) {
         this.queuedTiles.push([this.tick + 5, color, ix, iy]);
     }
-
+    
     update() {
         const newQueue = [];
         for(const item of this.queuedTiles) {
             const [tickAt, color, ix, iy] = item;
             if (this.tick > tickAt) {
-                const texture = this.colors.get(color);
-                this.tile(texture, ix * this.tileWidth, iy * this.tileWidth);        
+                this.ctx.fillStyle = colorNumToStr(color);
+                this.ctx.beginPath();
+                this.ctx.arc(ix * this.tileWidth, iy * this.tileWidth, this.tileWidth, 0, 2 * Math.PI);
+                this.ctx.fill();
             } else {
                 newQueue.push(item);
             }
         }
         this.queuedTiles = newQueue;
+        this.texture.update();
         this.tick++;
     }
 }
 
 export class World extends PIXI.Container{
-    private entities = new PIXI.Container<Updateable>();
-    private panel: Panel;
+    public entities = new PIXI.Container<Updateable>();
+    public panel: Panel;
     public renderer: PIXI.Renderer;
     public player: Player;
 
@@ -63,13 +69,13 @@ export class World extends PIXI.Container{
             })
         });
         this.client.serverOn("paint", (color: number, ix: number, iy: number) => {
-            this.panel.paint(color, ix, iy);
+           this.panel.paint(color, ix, iy);
         })
         this.client.serverOn("reset-world", this.onResetWorld.bind(this));
     }
 
-    private onResetWorld(colors: number[], tileWidth: number) {
-        this.panel = new Panel(colors, tileWidth, this);
+    private onResetWorld(colors: number[], tileWidth: number, panelWidth: number, panelHeight: number) {
+        this.panel = new Panel(colors, tileWidth, panelWidth, panelHeight, this);
         this.panel.zIndex = 1;
         this.addChild(this.panel);
         this.sortChildren();
