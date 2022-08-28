@@ -10,7 +10,7 @@ export class HTMLController {
     mount(container: HTMLElement) {
         this.bindedKeys.forEach((key) => this.bindKey(key));
         container.addEventListener("mousemove", (e) => {
-            this.pointer = new Vector2(e.clientX, e.clientY);
+            this.pointer = new Vector2(e.offsetX, e.offsetY);
         })
         container.addEventListener("mousedown", () => {
             this.pressedPointerLeft = true;

@@ -67,7 +67,7 @@ export function Entry(props: EntryProps) {
         await wait(1500);
 
         return gameStarted;
-    })
+    }, '自动进入游戏')
 
     return (
         <div className="entry">
