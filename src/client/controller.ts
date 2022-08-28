@@ -1,12 +1,23 @@
 import keyboardjs from "keyboardjs";
-import type { GameAppClient } from "./app";
+import { Vector2 } from "../server/utils";
 
 export class HTMLController {
+    public pointer: Vector2;
     private pressedKey: Map<string, boolean> = new Map();
+    private pressedPointerLeft: boolean = false;
     private bindedKeys = ["up", "down", "left", "right"];
 
-    mount() {
+    mount(container: HTMLElement) {
         this.bindedKeys.forEach((key) => this.bindKey(key));
+        container.addEventListener("mousemove", (e) => {
+            this.pointer = new Vector2(e.clientX, e.clientY);
+        })
+        container.addEventListener("mousedown", () => {
+            this.pressedPointerLeft = true;
+        })
+        container.addEventListener("mouseup", () => {
+            this.pressedPointerLeft = false;
+        })
     }
 
     unmount() {
@@ -25,5 +36,8 @@ export class HTMLController {
     keyPressed(key: string) {
         return this.pressedKey.get(key);
     }
-    
+
+    pointerLeftPressed() {
+        return this.pressedPointerLeft;
+    }   
 }

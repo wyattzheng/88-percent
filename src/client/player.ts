@@ -1,23 +1,24 @@
 import * as PIXI from "pixi.js";
+import { Vector2 } from "../server/utils";
 import type { GameAppClient } from "./app";
 import type { HTMLController } from "./controller";
 import { MoveManager, PredictedMoveManager, SmoothMoveManager } from "./move";
 import { generateCircleTexture } from "./utils";
 
 export class Player extends PIXI.Container{
+    public id: number;
     private moveManager: MoveManager;
     private controller: HTMLController;
     private sprite: PIXI.Sprite;
     private radius = 20;
     private isMyself: boolean;
-    private playerId: number;
     constructor(
         private client: GameAppClient,
         x: number, y: number,
         private attrs: any
     ) {
         super();
-        this.playerId = attrs.id;
+        this.id = attrs.id;
         this.isMyself = attrs.name === client.getPlayerName();
         if (this.isMyself) {
             client.world.setPlayer(this);
@@ -42,7 +43,7 @@ export class Player extends PIXI.Container{
         this.addChild(nameText);
 
         this.client.serverOn("player-move", (playerId: number, x: number, y: number, inputId: number) => {
-            if (this.playerId !== playerId) {
+            if (this.id !== playerId) {
                 return;
             }
             this.moveManager.ackInput(x, y, inputId);
@@ -54,7 +55,11 @@ export class Player extends PIXI.Container{
         this.client.serverEmit("control-player-move", deltaX, deltaY, inputId);
     }
 
-    updateControl() {
+    getWatchDirection() {
+        return this.client.controller.pointer.sub(new Vector2(this.x, this.y)).rad();
+    }
+
+    updateKeyControl() {
         if (!this.controller) {
             return;
         }
@@ -77,9 +82,19 @@ export class Player extends PIXI.Container{
         }
     }
 
+    updatePointerControl() {
+        if (!this.controller) {
+            return;
+        }
+        if(this.controller.pointerLeftPressed()) {
+            this.client.serverEmit("emit-ball", this.getWatchDirection());
+        }
+    }
+
     update() {
         if (this.isMyself) {
-            this.updateControl();
+            this.updateKeyControl();
+            this.updatePointerControl();
         }
         this.moveManager.update();
     }

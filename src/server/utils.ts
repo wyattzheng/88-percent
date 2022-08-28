@@ -9,6 +9,9 @@ export class Vector2 {
     sub(vec2: Vector2) {
         return new Vector2(this.x - vec2.x, this.y - vec2.y);
     }
+    lengthSquared() {
+        return Math.hypot(this.x, this.y);
+    }
     vertical() { // 该向量的垂直向量
         // x1 * x2 + y1 * y2 = 0
         // x1x2 = -y1y2
@@ -120,4 +123,35 @@ export function getFirstPointInSegment(segA: Vector2, segB: Vector2, points: Vec
 		return points.sort((a, b) => (Math.abs(a.y - segA.y) - Math.abs(b.y - segA.y)))[0];
 	}
 	return points.sort((a, b) => (Math.abs(a.x - segA.x) - Math.abs(b.x - segA.x)))[0];
+}
+
+export function adjustColorLightness(color: number, lightness: number) {
+    let b = color >> 0 & 0xFF
+    let g = color >> 8 & 0xFF
+    let r = color >> 16 & 0xFF;
+
+    b += lightness;
+    g += lightness;
+    r += lightness;
+
+    if (b > 255) {
+        b = 255;
+    } else if (b < 0){
+        b = 0;
+    }
+    if (g > 255) {
+        g = 255;
+    } else if (g < 0){
+        g = 0;
+    }
+    if (r > 255) {
+        r = 255;
+    } else if (r < 0){
+        r = 0;
+    }
+
+    let res = r << 16 & 0xFFFFFF
+    res |= g << 8 & 0xFFFF;
+    res |= b & 0xFF;
+    return res;
 }

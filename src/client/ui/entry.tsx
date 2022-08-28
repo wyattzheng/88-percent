@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import type { GameAppClient } from "../app";
-import { Controller } from "./controller";
+import { Shortcut } from "./shortcut";
+import { useDevAction } from "./devtools";
 
 import "./entry.css";
+import { wait } from "./utils";
 
 export interface EntryProps{
     app: GameAppClient
@@ -58,14 +60,17 @@ export function Entry(props: EntryProps) {
         ))
     }, [playerList]);
 
-    useEffect(() => {
-        setTimeout(() => onEnterClicked(), 500);
-        setTimeout(() => onStartClicked(), 2000);
-    }, []);
+    useDevAction(async () => {
+        onEnterClicked();
+        await wait(500);
+        onStartClicked();
+        await wait(1500);
+
+        return gameStarted;
+    })
 
     return (
         <div className="entry">
-            <Controller app={props.app} gameStarted={gameStarted}></Controller>
             {
                 !roomEntered && !gameStarted &&
                 <div className="room-enter">
@@ -85,6 +90,7 @@ export function Entry(props: EntryProps) {
                     <div><button onClick={onStartClicked}>🎮 开始游戏</button></div>
                 </div>
             }
+            <Shortcut></Shortcut>
         </div>
     )
 }

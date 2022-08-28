@@ -64,7 +64,7 @@ export class GameAppClient extends EventEmitter{
 
         this.gameContainer = container;
 
-        this.controller.mount();
+        this.controller.mount(container);
     }
 
     unmount() {

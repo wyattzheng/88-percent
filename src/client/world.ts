@@ -4,7 +4,8 @@ import { PaintBall } from "./ball";
 import { Player } from "./player";
 import { colorNumToStr } from "./utils";
 
-interface Updateable extends PIXI.DisplayObject {
+export interface Entity extends PIXI.DisplayObject {
+    id: number;
     update?(): void;
 }
 
@@ -35,9 +36,10 @@ export class Panel extends PIXI.Sprite{
             const [tickAt, color, ix, iy] = item;
             if (this.tick > tickAt) {
                 this.ctx.fillStyle = colorNumToStr(color);
-                this.ctx.beginPath();
-                this.ctx.arc(ix * this.tileWidth, iy * this.tileWidth, this.tileWidth, 0, 2 * Math.PI);
-                this.ctx.fill();
+    //          this.ctx.beginPath();
+    //          this.ctx.arc(ix * this.tileWidth, iy * this.tileWidth, this.tileWidth, 0, 2 * Math.PI);
+    //          this.ctx.fill();
+                this.ctx.fillRect(ix * this.tileWidth, iy * this.tileWidth, this.tileWidth, this.tileWidth);
             } else {
                 newQueue.push(item);
             }
@@ -49,7 +51,7 @@ export class Panel extends PIXI.Sprite{
 }
 
 export class World extends PIXI.Container{
-    public entities = new PIXI.Container<Updateable>();
+    public entities = new PIXI.Container<Entity>();
     public panel: Panel;
     public renderer: PIXI.Renderer;
     public player: Player;
@@ -68,8 +70,13 @@ export class World extends PIXI.Container{
                 }
             })
         });
-        this.client.serverOn("paint", (color: number, ix: number, iy: number) => {
-           this.panel.paint(color, ix, iy);
+        this.client.serverOn("remove-entity", (id: number) => {
+            this.entities.removeChild(this.getEntity(id));
+        })
+        this.client.serverOn("paint", (paintings: number[][]) => {
+            for(const painting of paintings) {
+                this.panel.paint(painting[0], painting[1], painting[2]);
+            }
         })
         this.client.serverOn("reset-world", this.onResetWorld.bind(this));
     }
@@ -79,6 +86,14 @@ export class World extends PIXI.Container{
         this.panel.zIndex = 1;
         this.addChild(this.panel);
         this.sortChildren();
+    }
+
+    private getEntity(id: number) {
+        return this.entities.children.find((x) => x.id === id);
+    }
+
+    getPointer() {
+        return this.client.controller.pointer;
     }
 
     setPlayer(player: Player) {

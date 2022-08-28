@@ -14,35 +14,32 @@ export class PaintBall extends Entity{
         super(x, y, world);
         this.direction = direction;
         this.speed = speed;
+        this.motionX = Math.cos(direction) * this.speed;
+        this.motionY = Math.sin(direction) * this.speed;
     }
 
     private updateMove() {
-        let newX = this.x + Math.cos(this.direction) * this.speed;
-        let newY = this.y + Math.sin(this.direction) * this.speed;
-
         let newDirection = this.direction;
-        const dirVec = new Vector2(newX - this.x, newY - this.y);
+        const dirVec = new Vector2(Math.cos(this.direction), Math.sin(this.direction));
         const xVec = new Vector2(1, 0);
         const yVec = new Vector2(0, 1);
 
-        if (newY < this.radius) { // 与上边缘相碰
+        if (this.y < this.radius) { // 与上边缘相碰
             newDirection = dirVec.reflect(xVec.vertical()).rad();
-            newY = this.radius;
-        } else if (newY > this.world.height - this.radius) {
+            this.y = this.radius;
+        } else if (this.y > this.world.height - this.radius) {
             newDirection = dirVec.reflect(xVec.vertical()).rad();
-            newY = this.world.height - this.radius
-        } else if (newX < this.radius) {
+            this.y = this.world.height - this.radius
+        } else if (this.x < this.radius) {
             newDirection = dirVec.reflect(yVec.vertical()).rad();
-            newX = this.radius;
-        } else if (newX > this.world.width - this.radius) {
+            this.x = this.radius;
+        } else if (this.x > this.world.width - this.radius) {
             newDirection = dirVec.reflect(yVec.vertical()).rad();
-            newX = this.world.width - this.radius;
+            this.x = this.world.width - this.radius;
         }
 
         this.direction = newDirection;
-
-        this.x = newX;
-        this.y = newY;
+        this.changeDirection(this.direction)
     }
 
     private updatePaint() {
@@ -54,9 +51,16 @@ export class PaintBall extends Entity{
         this.attrs.set("radius", this.radius);
     }
 
+    private updateLive() {
+        if(this.getMotion().lengthSquared() < 0.01) { // 没有速度了
+            this.world.removeEntity(this);
+        }
+    }
+
     update(): void {
         super.update();
         this.updateMove();
         this.updatePaint();
+        this.updateLive();
     }
 }

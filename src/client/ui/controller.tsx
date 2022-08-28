@@ -1,14 +1,13 @@
-import React, { useEffect } from "react";
-import keyboardJs from "keyboardjs";
+import React from "react";
 import type { GameAppClient } from "../app";
 
-export function Controller(props: { app: GameAppClient, gameStarted: boolean }) {
-    
-    useEffect(() => {
-        if(!props.gameStarted) {
-            return;
-        }
-    }, [props.gameStarted]);
+import "./controller.css"
 
-    return <></>
+export function Controller(props: { app: GameAppClient, gameStarted: boolean }) {
+
+    return (
+        <div className="controller">
+
+        </div>
+    )
 }

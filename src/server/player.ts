@@ -1,7 +1,9 @@
 import { Socket } from "socket.io";
+import { PaintBall } from "./ball";
 import { Entity } from "./entity";
 import { Room } from "./room";
 import type { GameAppServer } from "./server";
+import { adjustColorLightness } from "./utils";
 import type { World } from "./world";
 
 export class LobbyPlayer{
@@ -75,13 +77,19 @@ export class LobbyPlayer{
 export class Player extends Entity{
     private lastMoveInputId: number = 0;
     private forceReportMove: boolean = false;
+    private paintColor: number;
     private radius = 20;
 
     constructor(private lobbyPlayer: LobbyPlayer, x: number, y: number, private color: number, world: World) {
         super(x, y, world);
 
         this.server = world.server;
+        this.paintColor = adjustColorLightness(color, -150);
         this.lobbyPlayer.on("control-player-move", this.onControlPlayerMove.bind(this));
+        this.lobbyPlayer.on("emit-ball", (direction: number) => {
+            this.world.addEntity(new PaintBall(this.paintColor, direction, 50, this.x, this.y, this.world));
+    
+        })
     }
 
     private onControlPlayerMove(x: number, y: number, inputId: number) {
@@ -103,6 +111,10 @@ export class Player extends Entity{
 
     getColor() {
         return this.color;
+    }
+
+    getPaintColor() {
+        return this.paintColor;
     }
 
     updateAttrs() {

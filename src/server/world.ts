@@ -3,7 +3,7 @@ import type { Entity } from "./entity";
 import { LobbyPlayer, Player } from "./player";
 import { Room } from "./room";
 import { GameAppServer } from "./server";
-import { getPointsSegmentInRect, Vector2 } from "./utils";
+import { adjustColorLightness, getPointsSegmentInRect, Vector2 } from "./utils";
 
 export type Color = number;
 
@@ -11,6 +11,8 @@ export class Panel{
     private colorMap: (Color | null)[][] = [];
     public readonly width: number;
     public readonly height: number;
+
+    private paintings: [number, number, number][] = [];
     constructor(private colors: Color[], private world: World) {
         this.width = Math.floor(world.width / world.tileWidth);
         this.height = Math.floor(world.height / world.tileWidth);
@@ -31,7 +33,7 @@ export class Panel{
         const iy = Math.floor(y / this.world.tileWidth);
         if (this.colorMap[iy][ix] !== color) {
             this.colorMap[iy][ix] = color;
-            this.world.broadcast("paint", color, ix, iy);
+            this.paintings.push([color, ix, iy]);
         }
     }
     paintColorLine(color: Color, from: Vector2, to: Vector2) {
@@ -52,6 +54,13 @@ export class Panel{
             }
     }
 
+    update() {
+        if (this.paintings.length > 0) {
+            this.world.broadcast("paint", this.paintings);
+            this.paintings = [];    
+        }
+    }
+
 }
 
 export class World{
@@ -59,9 +68,9 @@ export class World{
     private playerA: Player;
     private playerB: Player;
     private players: Player[];
-    private entities: Entity[] = [];
+    private entities: Set<Entity> = new Set();
     public panel: Panel;
-    public readonly tileWidth = 5;
+    public readonly tileWidth = 10;
     
     public readonly width = 1200;
     public readonly height = 600;
@@ -80,21 +89,24 @@ export class World{
         this.playerA = new Player(this.pA, 50, 50, 0xFF0000, this);
         this.playerB = new Player(this.pB, 50, 50, 0x0000FF, this);
         this.players = [this.playerA, this.playerB];
-        const colors = this.players.map((player) => player.getColor());
+        const colors = this.players.map((player) => player.getPaintColor());
         this.panel = new Panel(colors, this);
         this.broadcast("reset-world", colors, this.tileWidth, this.panel.width, this.panel.height);
         this.players.forEach((player) => {
             this.addEntity(player);
         })
 
-        this.addEntity(new PaintBall(0x0000FF, Math.PI * 3.2 / 2, 20, 50, 50, this));
-        this.addEntity(new PaintBall(0xFF0000, Math.PI * 3.6 / 2, 20, 50, 50, this));
         this.resetCoins();
     }
 
-    private addEntity(entity: Entity) {
-        this.entities.push(entity);
+    addEntity(entity: Entity) {
+        this.entities.add(entity);
         entity.spawn();
+    }
+
+    removeEntity(entity: Entity) {
+        entity.despawn()
+        this.entities.delete(entity);
     }
 
     private resetCoins() {
@@ -105,6 +117,7 @@ export class World{
         this.entities.forEach((entity) => {
             entity.update();
         })
+        this.panel.update();
     }
 
 }
