@@ -9,10 +9,10 @@ export function generateCircleTexture(renderer: Renderer, color: number, radius:
     return renderer.generateTexture(gr);
 }
 
-export function generateRectTexture(renderer: Renderer, color: number, width: number) {
+export function generateRectTexture(renderer: Renderer, color: number, width: number, height: number) {
     const gr = new PIXI.Graphics();
     gr.beginFill(color);
-    gr.drawRect(0, 0, width, width);
+    gr.drawRect(0, 0, width, height);
     gr.endFill();
     return renderer.generateTexture(gr);
 }

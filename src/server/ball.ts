@@ -24,12 +24,12 @@ export class PaintBall extends Entity{
         const xVec = new Vector2(1, 0);
         const yVec = new Vector2(0, 1);
 
-        if (this.y < this.radius) { // 与上边缘相碰
+        if (this.y > -this.radius) { // 与上边缘相碰
             newDirection = dirVec.reflect(xVec.vertical()).rad();
-            this.y = this.radius;
-        } else if (this.y > this.world.height - this.radius) {
+            this.y = -this.radius;
+        } else if (this.y < -(this.world.height - this.radius)) {
             newDirection = dirVec.reflect(xVec.vertical()).rad();
-            this.y = this.world.height - this.radius
+            this.y = -(this.world.height - this.radius)
         } else if (this.x < this.radius) {
             newDirection = dirVec.reflect(yVec.vertical()).rad();
             this.x = this.radius;
@@ -38,8 +38,24 @@ export class PaintBall extends Entity{
             this.x = this.world.width - this.radius;
         }
 
-        this.direction = newDirection;
-        this.changeDirection(this.direction)
+        for(const obstacle of this.world.getObstacles()) {
+            const cross = obstacle.checkCross(this)
+            if (cross === false) {
+                continue;
+            }
+            // console.debug("cross" , {x: this.x, y: this.y},count++, "|", this.direction, "->", newDirection, cross.onsegment, "|", this.lastPos.hash(), this.pos.hash(), "|", cross.point.hash())
+            if (!cross.onsegment) {
+                this.x = cross.point.x;
+                this.y = cross.point.y;    
+                newDirection = dirVec.reflect(obstacle.dirVec.vertical()).rad();
+            }
+            break;
+        }
+
+        if (newDirection !== this.direction) {
+            this.direction = newDirection;
+            this.changeDirection(this.direction)    
+        }
     }
 
     private updatePaint() {

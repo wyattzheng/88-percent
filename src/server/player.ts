@@ -101,7 +101,7 @@ export class Player extends Entity{
         if (newX > this.world.width - this.radius || newX < this.radius) {
             return;
         }
-        if (newY > this.world.height - this.radius || newY < this.radius) {
+        if (-newY > this.world.height - this.radius || -newY < this.radius) {
             return;
         }
 

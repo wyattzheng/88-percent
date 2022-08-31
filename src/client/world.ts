@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import { GameAppClient } from "./app";
 import { PaintBall } from "./ball";
+import { Obstacle } from "./obstacle";
 import { Player } from "./player";
 import { colorNumToStr } from "./utils";
 
@@ -9,7 +10,7 @@ export interface Entity extends PIXI.DisplayObject {
     update?(): void;
 }
 
-export const entityFactory = [Player, PaintBall];
+export const entityFactory = [Player, PaintBall, Obstacle];
 
 export class Panel extends PIXI.Sprite{
     private colors: PIXI.Texture[] = [];
@@ -62,10 +63,10 @@ export class World extends PIXI.Container{
         this.renderer = client.renderer;
         this.entities.zIndex = 2;
         this.addChild(this.entities);
-        this.client.serverOn("add-entity", (type: string, x, y, attrs) => {
+        this.client.serverOn("add-entity", (type: string, id, x, y, attrs) => {
             entityFactory.forEach((entityClass) => {
                 if (entityClass.name === type) {
-                    const entity = new entityClass(client, x, y, attrs);
+                    const entity = new entityClass(client, id, x, y, attrs);
                     this.entities.addChild(entity);
                 }
             })

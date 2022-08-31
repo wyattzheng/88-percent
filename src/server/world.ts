@@ -1,9 +1,9 @@
-import { PaintBall } from "./ball";
 import type { Entity } from "./entity";
+import { Obstacle } from "./obstacle";
 import { LobbyPlayer, Player } from "./player";
 import { Room } from "./room";
 import { GameAppServer } from "./server";
-import { adjustColorLightness, getPointsSegmentInRect, Vector2 } from "./utils";
+import { getPointsSegmentInRect, Vector2 } from "./utils";
 
 export type Color = number;
 
@@ -16,6 +16,7 @@ export class Panel{
     constructor(private colors: Color[], private world: World) {
         this.width = Math.floor(world.width / world.tileWidth);
         this.height = Math.floor(world.height / world.tileWidth);
+        console.log("地图大小", this.width, this.height)
         this.initMap();
     }
     private initMap() {
@@ -27,6 +28,9 @@ export class Panel{
     }
     paintColor(color: Color, x: number, y: number) {
         if (!this.colors.includes(color)) {
+            return;
+        }
+        if (x >= this.width || y >= this.height || x < 0 || y < 0) {
             return;
         }
         const ix = Math.floor(x / this.world.tileWidth);
@@ -86,8 +90,8 @@ export class World{
     }
 
     reset() {
-        this.playerA = new Player(this.pA, 50, 50, 0xFF0000, this);
-        this.playerB = new Player(this.pB, 50, 50, 0x0000FF, this);
+        this.playerA = new Player(this.pA, 50, -50, 0xFF0000, this);
+        this.playerB = new Player(this.pB, 50, -50, 0x0000FF, this);
         this.players = [this.playerA, this.playerB];
         const colors = this.players.map((player) => player.getPaintColor());
         this.panel = new Panel(colors, this);
@@ -95,6 +99,9 @@ export class World{
         this.players.forEach((player) => {
             this.addEntity(player);
         })
+
+        this.addEntity(new Obstacle(1, 100, 100, -100, this));
+        this.addEntity(new Obstacle(1, 150, 150, -100, this));
 
         this.resetCoins();
     }
@@ -107,6 +114,10 @@ export class World{
     removeEntity(entity: Entity) {
         entity.despawn()
         this.entities.delete(entity);
+    }
+
+    getObstacles() {
+        return Array.from(this.entities).filter((entity) => (entity instanceof Obstacle)) as Obstacle[];
     }
 
     private resetCoins() {

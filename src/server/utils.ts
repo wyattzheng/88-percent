@@ -3,7 +3,17 @@ export class Vector2 {
     dot(vec2: Vector2) {
         return this.x * vec2.x + this.y * vec2.y;
     }
-    multiply(val: number) {
+    cross(vec2: Vector2) {
+        return this.x * vec2.y - this.y * vec2.x;
+    }
+    normalize() {
+        const len = this.lengthSquared();
+        return new Vector2(this.x / len, this.y / len);
+    }
+    add(vec2: Vector2) {
+        return new Vector2(this.x + vec2.x, this.y + vec2.y);
+    }
+    scale(val: number) {
         return new Vector2(this.x * val, this.y * val);
     }
     sub(vec2: Vector2) {
@@ -30,7 +40,7 @@ export class Vector2 {
      * @param n 关于的向量
      */
     reflect(n: Vector2) { // v2 = v1 - 2(v1.n)n
-        const result = this.sub(n.multiply(2 * this.dot(n)))
+        const result = this.sub(n.scale(2 * this.dot(n)))
         return result;
     }
 
@@ -40,7 +50,7 @@ export class Vector2 {
     
     rad() {
 		const acos = Math.acos(this.cos());
-		const rad = this.y > 0 ? acos : 2 * Math.PI - acos;
+		const rad = this.y > 0 ? acos : (2 * Math.PI - acos);
 		return rad;
 	}
 
@@ -49,9 +59,64 @@ export class Vector2 {
 		return this.x / r;
 	}
 
+    hash() {
+        return `${this.x}:${this.y}`
+    }
+
     static fromRad(rad: number) {
         return new Vector2(Math.cos(rad), Math.sin(rad));
     }
+}
+
+/**
+ * 点在直线的哪一边
+ * 
+ * @returns > 0 在右边, = 0 在线上, < 0 在左边
+ */
+export function sideOfSegment(M: Vector2, A: Vector2, B: Vector2) {
+    return (B.y - M.y) * (A.x - M.x) - (A.y - M.y) * (B.x - M.x);
+}
+
+export function isPointInRect(M: Vector2, from: Vector2, to: Vector2) {
+    return Math.min(from.x, to.x) <= M.x && M.x <= Math.max(from.x, to.x) && 
+           Math.min(from.y, to.y) <= M.y && M.y <= Math.max(from.y, to.y);
+}
+
+export function getCrossPoint(A: Vector2, B: Vector2, C: Vector2, D: Vector2) {
+    const p = A;
+    const u = B.sub(A).normalize();
+    const q = C;
+    const v = D.sub(C).normalize();
+    return p.add(u.scale(q.sub(p).cross(v) / u.cross(v)));
+}
+
+export function checkSegmentCross(A: Vector2, B: Vector2, C: Vector2, D: Vector2) {
+    const posA = sideOfSegment(A, C, D);
+    const posB = sideOfSegment(B, C, D);
+    const posC = sideOfSegment(C, A, B);
+    const posD = sideOfSegment(D, A, B);
+
+    const min = 1e-4;
+
+    if(posA * posB < -min && posC * posD < -min) { // 跨立实验
+        return {point: getCrossPoint(A, B, C, D), onsegment: false};
+    }
+
+     // 点在直线上, 且点在矩形中 -> 点在线段上
+    if (Math.abs(posA) < min && isPointInRect(A, C, D)) {
+        return {point: A, onsegment: true};
+    }
+    if (Math.abs(posB) < min && isPointInRect(B, C, D)) {
+        return {point: B, onsegment: true};
+    }
+    if (Math.abs(posC) < min && isPointInRect(C, A, B)) {
+        return {point: C, onsegment: true};
+    }
+    if (Math.abs(posD) < min && isPointInRect(D, A, B)) {
+        return {point: D, onsegment: true};
+    }
+
+    return false;
 }
 
 export function getPointsSegmentInRect(segA: Vector2, segB: Vector2, minX: number, maxX: number, minY: number, maxY: number): Vector2[] {

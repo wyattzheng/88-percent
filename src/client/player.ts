@@ -6,19 +6,19 @@ import { MoveManager, PredictedMoveManager, SmoothMoveManager } from "./move";
 import { generateCircleTexture } from "./utils";
 
 export class Player extends PIXI.Container{
-    public id: number;
     private moveManager: MoveManager;
     private controller: HTMLController;
     private sprite: PIXI.Sprite;
     private radius = 20;
     private isMyself: boolean;
+    private pressed = false;
     constructor(
         private client: GameAppClient,
+        public id: number,
         x: number, y: number,
         private attrs: any
     ) {
         super();
-        this.id = attrs.id;
         this.isMyself = attrs.name === client.getPlayerName();
         if (this.isMyself) {
             client.world.setPlayer(this);
@@ -26,9 +26,9 @@ export class Player extends PIXI.Container{
         this.controller = this.client.controller;
         this.moveManager = this.isMyself ? new PredictedMoveManager({ x, y }) : new SmoothMoveManager({ x, y });
         this.moveManager.on("newPos", ({ x, y }) => {
-            this.position.set(x, y);
+            this.position.set(x, -y);
         })
-        this.position.set(x, y);
+        this.position.set(x, -y);
 
         this.radius = attrs.radius;
         this.sprite = new PIXI.Sprite(generateCircleTexture(this.client.renderer, attrs.color, this.radius));
@@ -50,13 +50,17 @@ export class Player extends PIXI.Container{
         });
     }
 
+    get pos() {
+        return new Vector2(this.x, -this.y);
+    }
+
     move(deltaX: number, deltaY: number) {
         const inputId = this.moveManager.addInput(deltaX, deltaY);
         this.client.serverEmit("control-player-move", deltaX, deltaY, inputId);
     }
 
     getWatchDirection() {
-        return this.client.controller.pointer.sub(new Vector2(this.x, this.y)).rad();
+        return this.client.controller.pointer.sub(this.pos).rad();
     }
 
     updateKeyControl() {
@@ -65,10 +69,10 @@ export class Player extends PIXI.Container{
         }
         let deltaX = 0; let deltaY = 0;
         if (this.controller.keyPressed("up")) {
-            deltaY -= 5;
+            deltaY += 5;
         }
         if (this.controller.keyPressed("down")) {
-            deltaY += 5;
+            deltaY -= 5;
         }
         if (this.controller.keyPressed("left")) {
             deltaX -= 5;
@@ -87,6 +91,9 @@ export class Player extends PIXI.Container{
             return;
         }
         if(this.controller.pointerLeftPressed()) {
+            this.pressed = true;
+        } else if(this.pressed) {
+            this.pressed = false;
             this.client.serverEmit("emit-ball", this.getWatchDirection());
         }
     }

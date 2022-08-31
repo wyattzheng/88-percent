@@ -27,6 +27,18 @@ export class Entity{
         this.room = world.room;
     }
 
+    get pos() {
+        return new Vector2(this.x, this.y);
+    }
+
+    get lastPos() {
+        return new Vector2(this.lastX, this.lastY);
+    }
+
+    getName() {
+        return this.constructor.name;
+    }
+
     getMotion() {
         return new Vector2(this.motionX, this.motionY)
     }
@@ -41,7 +53,7 @@ export class Entity{
     spawn() {
         this.updateAttrs();
         const type = this.constructor.name;
-        this.world.broadcast("add-entity", type, this.x, this.y, this.attrs.getAll());
+        this.world.broadcast("add-entity", type, this.id, this.x, this.y, this.attrs.getAll());
     }
 
     despawn() {
@@ -65,21 +77,15 @@ export class Entity{
         this.x += this.motionX;
         this.y += this.motionY;
 
-        if (this.motionX > 0) {
-            this.motionX = Math.max(0, this.motionX - this.friction);
-        } else {
-            this.motionX = Math.min(0, this.motionX + this.friction);
-        }
-
-        if (this.motionY > 0) {
-            this.motionY = Math.max(0, this.motionY - this.friction); 
-        } else {
-            this.motionY = Math.min(0, this.motionY + this.friction);        
-        }
+        
+        const speed = this.getMotion().lengthSquared();
+        const newSpeed = Math.max(speed - this.friction, 0);
+        this.motionX = this.motionX * (newSpeed / speed)
+        this.motionY = this.motionY * (newSpeed / speed)
     }
 
     protected updateAttrs() {
-        this.attrs.set("id", this.id);
+
     }
 
     update() {
