@@ -1,3 +1,5 @@
+/// <reference types="styled-jsx/global" />
+
 import { GameAppClient } from "./app"
 
 (function bootstrap() {

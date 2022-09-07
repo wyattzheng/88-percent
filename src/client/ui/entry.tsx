@@ -2,8 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import type { GameAppClient } from "../app";
 import { Shortcut } from "./shortcut";
 import { useDevAction } from "./devtools";
-
-import "./entry.css";
 import { wait } from "./utils";
 
 export interface EntryProps{
@@ -91,6 +89,20 @@ export function Entry(props: EntryProps) {
                 </div>
             }
             <Shortcut></Shortcut>
+            <style jsx>{`
+                .entry{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    color: #FFF;
+                }
+                .room-enter input{
+                    outline: 0;
+                }
+            `}</style>
         </div>
     )
 }

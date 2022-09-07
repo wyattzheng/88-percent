@@ -1,7 +1,5 @@
 import React from "react";
 
-import "./shortcut.css";
-
 export function Shortcut() {
     
     return (
@@ -11,6 +9,27 @@ export function Shortcut() {
                     
                 </div>
             </div>
+            <style jsx>{`
+                #shortcut-container{
+                    bottom: 0px;
+                    display: flex;
+                    justify-content: center;
+                }
+                
+                #shortcut{
+                    position: absolute;
+                    bottom: 10px;
+                    height: 80px;
+                    padding: 5px;
+                    display: flex;
+                    flex-direction: row;
+                }
+                
+                .shortcut-item{
+                    width: 60px;
+                    background-color: brown;
+                }
+            `}</style>
         </div>
     )
 }
