@@ -49,7 +49,6 @@ export class PaintBall extends Entity{
                 this.y = cross.point.y;    
                 newDirection = dirVec.reflect(obstacle.dirVec.vertical()).rad();
             }
-            break;
         }
 
         if (newDirection !== this.direction) {
