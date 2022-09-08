@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { Renderer } from "pixi.js";
+import { LINE_JOIN, Renderer } from "pixi.js";
 
 export function generateCircleTexture(renderer: Renderer, color: number, radius: number) {
     const gr = new PIXI.Graphics();

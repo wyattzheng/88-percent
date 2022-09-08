@@ -22,19 +22,19 @@ export class Panel{
     private initMap() {
         for(let y=0;y<this.height;y++)
             for(let x=0;x<this.width;x++) {
-                this.colorMap[y] ||= [];
-                this.colorMap[y][x] = null;
+                this.colorMap[-y] ||= [];
+                this.colorMap[-y][x] = null;
             }
     }
     paintColor(color: Color, x: number, y: number) {
         if (!this.colors.includes(color)) {
             return;
         }
-        if (x >= this.width || y >= this.height || x < 0 || y < 0) {
-            return;
-        }
         const ix = Math.floor(x / this.world.tileWidth);
         const iy = Math.floor(y / this.world.tileWidth);
+        if (ix >= this.width || -iy >= this.height || x < 0 || y > 0) {
+            return;
+        }
         if (this.colorMap[iy][ix] !== color) {
             this.colorMap[iy][ix] = color;
             this.paintings.push([color, ix, iy]);
@@ -101,7 +101,7 @@ export class World{
         })
 
         this.addEntity(new Obstacle(1, 100, 100, -100, this));
-        this.addEntity(new Obstacle(1, 150, 150, -100, this));
+        this.addEntity(new Obstacle(2, 150, 250, -150, this));
 
         this.resetCoins();
     }

@@ -3,7 +3,7 @@ import React from "react";
 import io, { Socket } from "socket.io-client"
 import { World } from "./world";
 import { createRoot, Root } from "react-dom/client";
-import { Entry } from "./ui/entry";
+import { Main } from "./ui/main";
 import { EventEmitter } from "eventemitter3";
 import { HTMLController } from "./controller";
 
@@ -30,6 +30,8 @@ export class GameAppClient extends EventEmitter{
         this.gameApp = new PIXI.Application({
             width: 1200,
             height: 600,
+            backgroundColor: 0x2c2e41,
+            antialias: true
         });
         this.gameApp.ticker.add(() => {
             this.world?.update();
@@ -57,11 +59,10 @@ export class GameAppClient extends EventEmitter{
         uiContainer.style.inset = "0px";
 
         this.uiRoot = createRoot(uiContainer);
-        this.uiRoot.render(<Entry app={this} />)
+        this.uiRoot.render(<Main app={this} />)
         container.appendChild(uiContainer);
 
         this.gameContainer = container;
-
         this.controller.mount(container);
     }
 

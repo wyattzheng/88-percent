@@ -3,8 +3,9 @@ import type { GameAppClient } from "../app";
 import { Shortcut } from "./shortcut";
 import { useDevAction } from "./devtools";
 import { wait } from "./utils";
+import { Room } from "./room";
 
-export interface EntryProps{
+export interface MainProps{
     app: GameAppClient
 }
 
@@ -12,33 +13,25 @@ export function getRandomName() {
     return "wyatt" + Math.floor(Math.random() * 100);
 }
 
-export function Entry(props: EntryProps) {
+export function Main(props: MainProps) {
     const [roomEntered, setRoomEntered] = useState(false);
-    const [roomReady, setRoomReady] = useState(false);
     const [playerName, setPlayerName] = useState(getRandomName());
     const [roomId, setRoomId] = useState("test");
-    const [playerList, setPlayerList] = useState<string[]>([]);
     const [gameStarted, setGameStarted] = useState(false);
 
     useEffect(() => {
-        let onUpdatedList, onEnteredRoom, onStartGame;
+        let onEnteredRoom, onStartGame;
 
         props.app.serverOn("entered-room", onEnteredRoom = () => {
             setRoomEntered(true);
         })
         
-        props.app.serverOn("room-update", onUpdatedList = (playerList, roomReady) => {
-            setRoomReady(roomReady);
-            setPlayerList(playerList);
-        });
-
         props.app.serverOn("start-game", onStartGame = () => {
             setGameStarted(true);
         })
 
         return () => {
             props.app.serverOff("entered-room", onEnteredRoom);
-            props.app.serverOff("room-update", onUpdatedList);
             props.app.serverOff("start-game", onStartGame);
         }
     }, []);
@@ -48,20 +41,10 @@ export function Entry(props: EntryProps) {
         props.app.serverEmit("request-enter-room", roomId);
     }
 
-    const onStartClicked = () => {
-        props.app.serverEmit("start-game");
-    }
-
-    const playerListElems = useMemo(() => {
-        return playerList.map((player) => (
-            <div key={player}>{player}</div>
-        ))
-    }, [playerList]);
-
     useDevAction(async () => {
         onEnterClicked();
         await wait(500);
-        onStartClicked();
+        props.app.serverEmit("start-game");
         await wait(1500);
 
         return gameStarted;
@@ -81,12 +64,7 @@ export function Entry(props: EntryProps) {
             }
             {
                 roomEntered && !gameStarted &&
-                <div className="room">
-                    <div>房间号:{roomId}</div>
-                    <div>玩家列表:</div>
-                    <div className="room-player-list">{playerListElems}</div>
-                    <div><button onClick={onStartClicked}>🎮 开始游戏</button></div>
-                </div>
+                <Room app={props.app} roomId={roomId} ></Room>
             }
             <Shortcut></Shortcut>
             <style jsx>{`

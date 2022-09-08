@@ -37,10 +37,10 @@ export class Panel extends PIXI.Sprite{
             const [tickAt, color, ix, iy] = item;
             if (this.tick > tickAt) {
                 this.ctx.fillStyle = colorNumToStr(color);
-    //          this.ctx.beginPath();
-    //          this.ctx.arc(ix * this.tileWidth, iy * this.tileWidth, this.tileWidth, 0, 2 * Math.PI);
-    //          this.ctx.fill();
-                this.ctx.fillRect(ix * this.tileWidth, iy * this.tileWidth, this.tileWidth, this.tileWidth);
+                this.ctx.beginPath();
+                this.ctx.arc(ix * this.tileWidth, -iy * this.tileWidth, this.tileWidth * 0.2, 0, 2 * Math.PI);
+                this.ctx.fill();
+    //            this.ctx.fillRect(ix * this.tileWidth, -iy * this.tileWidth, this.tileWidth, this.tileWidth);
             } else {
                 newQueue.push(item);
             }

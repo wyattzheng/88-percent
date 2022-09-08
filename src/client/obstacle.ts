@@ -12,7 +12,7 @@ export class Obstacle extends PIXI.Sprite{
         super();
         this.x = x;
         this.y = -y;
-        this.texture = generateRectTexture(this.client.renderer, 0xFF0000, this.attrs.width, 5);
+        this.texture = generateRectTexture(this.client.renderer, 0x55DDAA, this.attrs.width, 5);
         this.anchor.set(0.5, 0.5)
         this.rotation = -this.attrs.panelRad;
     }

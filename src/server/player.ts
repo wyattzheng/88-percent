@@ -84,7 +84,7 @@ export class Player extends Entity{
         super(x, y, world);
 
         this.server = world.server;
-        this.paintColor = adjustColorLightness(color, -150);
+        this.paintColor = adjustColorLightness(color, -50);
         this.lobbyPlayer.on("control-player-move", this.onControlPlayerMove.bind(this));
         this.lobbyPlayer.on("emit-ball", (direction: number) => {
             this.world.addEntity(new PaintBall(this.paintColor, direction, 50, this.x, this.y, this.world));
