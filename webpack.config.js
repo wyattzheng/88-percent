@@ -2,6 +2,7 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TextureLoaderPlugin = require('./build/texture-loader');
 
 const isProduction = process.env.NODE_ENV == 'production';
 const stylesHandler = 'style-loader';
@@ -10,6 +11,7 @@ const config = {
     entry: './src/client/index.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
+       // publicPath: "/public"
     },
     devServer: {
         open: true,
@@ -20,7 +22,10 @@ const config = {
         new HtmlWebpackPlugin({
             template: 'index.html',
         }),
-
+        new TextureLoaderPlugin({ 
+            rootDir: "./public",
+            rootPath: "./"
+        })
         // Add your plugins here
         // Learn more about plugins from https://webpack.js.org/configuration/plugins/
     ],

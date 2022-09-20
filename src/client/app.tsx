@@ -3,18 +3,20 @@ import React from "react";
 import io, { Socket } from "socket.io-client"
 import { World } from "./world";
 import { createRoot, Root } from "react-dom/client";
-import { Main } from "./ui/main";
+import { Bootstrap } from "./ui/main";
 import { EventEmitter } from "eventemitter3";
 import { HTMLController } from "./controller";
+import { TextureManager } from "./texture";
 
 export class GameAppClient extends EventEmitter{
     public world: World;
     public controller = new HTMLController();
+    public gameApp: PIXI.Application;
     private name: string;
     private client: Socket;
-    private gameApp: PIXI.Application;
     private gameContainer: HTMLElement;
     private uiRoot: Root;
+    private textureManager = new TextureManager();
 
     constructor(wsUrl: string) {
         super();
@@ -34,6 +36,7 @@ export class GameAppClient extends EventEmitter{
             antialias: true
         });
         this.gameApp.ticker.add(() => {
+            this.controller.update();
             this.world?.update();
         });
     }
@@ -59,7 +62,7 @@ export class GameAppClient extends EventEmitter{
         uiContainer.style.inset = "0px";
 
         this.uiRoot = createRoot(uiContainer);
-        this.uiRoot.render(<Main app={this} />)
+        this.uiRoot.render(<Bootstrap app={this} />)
         container.appendChild(uiContainer);
 
         this.gameContainer = container;
@@ -78,6 +81,10 @@ export class GameAppClient extends EventEmitter{
 
     private onPlayerLogined(name) {
         this.name = name;
+    }
+
+    texture(key: string) {
+        return this.textureManager.getUrl(key);
     }
 
     getPlayerName() {

@@ -7,8 +7,8 @@ import { Vector2 } from "./utils";
 export class Entity{
     static entityId: number = 0;
 
-    protected x: number;
-    protected y: number;
+    public x: number;
+    public y: number;
     protected lastX: number;
     protected lastY: number;
     protected motionX = 0;

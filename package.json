@@ -25,7 +25,9 @@
     "@webpack-cli/generators": "^2.5.0",
     "babel-loader": "^8.2.5",
     "css-loader": "^6.7.1",
+    "filehound": "^1.17.6",
     "html-webpack-plugin": "^5.5.0",
+    "js-string-escape": "^1.0.1",
     "npm-run-all": "^4.1.5",
     "style-loader": "^3.3.1",
     "styled-jsx": "^5.0.6",
@@ -36,6 +38,7 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "classnames": "^2.3.1",
     "eventemitter3": "^4.0.7",
     "keyboardjs": "^2.6.4",
     "nodemon": "^2.0.19",

@@ -1,8 +1,10 @@
 import { Socket } from "socket.io";
 import { PaintBall } from "./ball";
 import { Entity } from "./entity";
+import { PopGun } from "./items/popgun";
 import { Room } from "./room";
 import type { GameAppServer } from "./server";
+import { Shortcut } from "./shortcut";
 import { adjustColorLightness } from "./utils";
 import type { World } from "./world";
 
@@ -75,21 +77,20 @@ export class LobbyPlayer{
 }
 
 export class Player extends Entity{
+    public paintColor: number;
     private lastMoveInputId: number = 0;
     private forceReportMove: boolean = false;
-    private paintColor: number;
     private radius = 20;
+    private shortcut: Shortcut;
 
-    constructor(private lobbyPlayer: LobbyPlayer, x: number, y: number, private color: number, world: World) {
+    constructor(public lobbyPlayer: LobbyPlayer, x: number, y: number, private color: number, public world: World) {
         super(x, y, world);
 
         this.server = world.server;
+        this.shortcut = new Shortcut(this);
+        this.shortcut.setItem(0, new PopGun(this));
         this.paintColor = adjustColorLightness(color, -50);
         this.lobbyPlayer.on("control-player-move", this.onControlPlayerMove.bind(this));
-        this.lobbyPlayer.on("emit-ball", (direction: number) => {
-            this.world.addEntity(new PaintBall(this.paintColor, direction, 50, this.x, this.y, this.world));
-    
-        })
     }
 
     private onControlPlayerMove(x: number, y: number, inputId: number) {

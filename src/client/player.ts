@@ -11,7 +11,6 @@ export class Player extends PIXI.Container{
     private sprite: PIXI.Sprite;
     private radius = 20;
     private isMyself: boolean;
-    private pressed = false;
     constructor(
         private client: GameAppClient,
         public id: number,
@@ -90,11 +89,10 @@ export class Player extends PIXI.Container{
         if (!this.controller) {
             return;
         }
-        if(this.controller.pointerLeftPressed()) {
-            this.pressed = true;
-        } else if(this.pressed) {
-            this.pressed = false;
-            this.client.serverEmit("emit-ball", this.getWatchDirection());
+        if(this.controller.pointerLeftDown()) {
+            this.client.serverEmit("start-using", this.controller.pointer.x, this.controller.pointer.y)
+        } else if(this.controller.pointerLeftUp()) {
+            this.client.serverEmit("end-using", this.controller.pointer.x, this.controller.pointer.y);
         }
     }
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { GameAppClient } from "../app";
+import { useApp, useServerEvent } from "./utils";
 
 function RoomPlayer(props: { name: string }) {
 
@@ -13,24 +14,19 @@ function RoomPlayer(props: { name: string }) {
     )
 }
 
-export function Room(props: { app: GameAppClient, roomId: string }) {
+export function Room(props: { roomId: string }) {
     const [roomReady, setRoomReady] = useState(false);
     const [playerList, setPlayerList] = useState<string[]>([]);
+    const app = useApp();
 
     const onStartClicked = () => {
-        props.app.serverEmit("start-game");
+        app.serverEmit("start-game");
     }
     
-    useEffect(() => {
-        let onUpdatedList;
-        props.app.serverOn("room-update", onUpdatedList = (playerList, roomReady) => {
-            setRoomReady(roomReady);
-            setPlayerList(playerList);
-        });
-        return () => {
-            props.app.serverOff("room-update", onUpdatedList);
-        }
-    }, []);
+    useServerEvent("room-update", () => {
+        setRoomReady(roomReady);
+        setPlayerList(playerList);
+    })
 
     const playerListElems = useMemo(() => {
         return playerList.map((player) => (
