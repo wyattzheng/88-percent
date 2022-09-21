@@ -14,7 +14,7 @@ export class PopGun extends Item {
             life: 30,
             paintColor: this.player.paintColor, 
             direction, 
-            speed: 50, 
+            speed: 10, 
             x: this.player.x, 
             y: this.player.y,
             generation: 0
