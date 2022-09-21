@@ -52,12 +52,11 @@ export class Entity{
 
     spawn() {
         this.updateAttrs();
-        const type = this.constructor.name;
+        const type = this.getName();
         this.world.broadcast("add-entity", type, this.id, this.x, this.y, this.attrs.getAll());
     }
 
     despawn() {
-        const type = this.constructor.name;
         this.world.broadcast("remove-entity", this.id)
     }
 

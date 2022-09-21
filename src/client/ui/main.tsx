@@ -80,6 +80,7 @@ export function Main() {
                         width: 100%;
                         height: 100%;
                         color: #FFF;
+                        user-select: none;
                     }
                     .room-enter input{
                         outline: 0;

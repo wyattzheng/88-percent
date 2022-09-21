@@ -11,7 +11,7 @@ export function useApp(): GameAppClient{
     return useContext(UIContext).app;
 }
 
-export function useServerEvent(name: string, callback: (...args: any[]) => any) {
+export function useServerEvent(name: string, callback: (...args: any[]) => any, deps: any[] = []) {
     const app = useApp();
     useEffect(() => {
         const registered = callback;
@@ -19,10 +19,10 @@ export function useServerEvent(name: string, callback: (...args: any[]) => any) 
         return () => {
             app.serverOff(name, registered);
         }
-    }, [])
+    }, deps)
 }
 
-export function useKeyDown(keys: string | string[], fn: (key: string) => any) {
+export function useKeyDown(keys: string | string[], fn: (key: string) => any, deps: any[] = []) {
     const app = useApp();
 
     useEffect(() => {
@@ -30,5 +30,5 @@ export function useKeyDown(keys: string | string[], fn: (key: string) => any) {
         return () => {
             app.controller.offKeyDown(fn);
         }
-    }, []);
+    }, deps);
 }

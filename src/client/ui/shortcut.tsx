@@ -45,8 +45,18 @@ export function ShortcutItem(props: { index: number, activeIndex: number }) {
 
 export function Shortcut() {
     const [activeIndex, setActiveIndex] = useState(0);
+    const app = useApp();
     
-    useKeyDown(['1', '2', '3', '4', '5'], (key) => setActiveIndex(parseInt(key) - 1));
+    useKeyDown(['1', '2', '3', '4', '5'], (key) => {
+        const index = parseInt(key) - 1;
+        if (activeIndex !== index) {
+            app.serverEmit("set-active-index", index);
+        }
+    }, [activeIndex]);
+    
+    useServerEvent('set-active-index', (index) => {
+        setActiveIndex(index);
+    })
 
     return (
         <div id="shortcut-container">

@@ -29,8 +29,9 @@ export class Shortcut {
     }
 
     setActiveIndex(index: number) {
-        if (index < this.count && index >= 0) {
+        if (index < this.count && index >= 0 && index !== this.activeIndex) {
             this.activeIndex = index;
+            this.lobbyPlayer.emit("set-active-index", index);
         }
     }
 

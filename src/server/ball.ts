@@ -2,20 +2,30 @@ import { Entity } from "./entity";
 import { Vector2 } from "./utils";
 import { World } from "./world";
 
+export interface PaintBallProps{
+    life: number;
+    paintColor: number;
+    direction: number;
+    speed: number;
+    x: number;
+    y: number;
+}
 
 /**
  * 边经过路径并染色地板的球
  */
 export class PaintBall extends Entity{
     private direction: number; // [0, 2pi] rad
-    private speed: number; // distance per tick
+    protected speed: number; // distance per tick
     private radius = 5;
-    constructor(public paintColor: number, direction: number, speed: number, x: number, y: number, world: World) {
-        super(x, y, world);
-        this.direction = direction;
-        this.speed = speed;
-        this.motionX = Math.cos(direction) * this.speed;
-        this.motionY = Math.sin(direction) * this.speed;
+    protected liveTicks = 0;
+
+    constructor(protected props: PaintBallProps, world: World) {
+        super(props.x, props.y, world);
+        this.direction = props.direction;
+        this.speed = props.speed;
+        this.motionX = Math.cos(props.direction) * this.speed;
+        this.motionY = Math.sin(props.direction) * this.speed;
     }
 
     private updateMove() {
@@ -58,7 +68,7 @@ export class PaintBall extends Entity{
     }
 
     private updatePaint() {
-        this.world.panel.paintColorLine(this.paintColor, new Vector2(this.lastX, this.lastY) , new Vector2(this.x, this.y));
+        this.world.panel.paintColorLine(this.props.paintColor, new Vector2(this.lastX, this.lastY) , new Vector2(this.x, this.y));
     }
 
     protected updateAttrs(): void {
@@ -66,10 +76,16 @@ export class PaintBall extends Entity{
         this.attrs.set("radius", this.radius);
     }
 
+    protected onDead() {
+
+    }
+
     private updateLive() {
-        if(this.getMotion().lengthSquared() < 0.01) { // 没有速度了
+        if(this.liveTicks > this.props.life) {
             this.world.removeEntity(this);
+            this.onDead();
         }
+        this.liveTicks++;
     }
 
     update(): void {
@@ -77,5 +93,36 @@ export class PaintBall extends Entity{
         this.updateMove();
         this.updatePaint();
         this.updateLive();
+    }
+}
+
+export interface BoomBallProps extends PaintBallProps{
+    generation: number;
+}
+
+export class BoomBall extends PaintBall{
+    constructor(protected props: BoomBallProps, world: World) {
+        super(props, world)
+    }
+
+    getName(): string {
+        return "PaintBall";
+    }
+    protected onDead(): void {
+        super.onDead()
+        if (this.props.generation >= 2) {
+            return;
+        }
+        for(let i=0;i<= 2 * Math.PI;i+=Math.PI / 4) {
+            this.world.addEntity(new BoomBall({
+                generation: this.props.generation + 1,
+                life: this.props.life * 0.75,
+                paintColor: this.props.paintColor,
+                direction: i,
+                speed: this.props.speed,
+                x: this.x,
+                y: this.y
+            }, this.world));
+        }
     }
 }

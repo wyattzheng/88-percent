@@ -1,4 +1,4 @@
-import { PaintBall } from "../ball";
+import { BoomBall, PaintBall } from "../ball";
 import type { Player } from "../player";
 import { Vector2 } from "../utils";
 import { Item } from "./item";
@@ -10,7 +10,15 @@ export class PopGun extends Item {
     }
 
     startUsing(pointer: Vector2, direction: number) {
-        this.world.addEntity(new PaintBall(this.player.paintColor, direction, 50, this.player.x, this.player.y, this.world));
+        this.world.addEntity(new BoomBall({
+            life: 30,
+            paintColor: this.player.paintColor, 
+            direction, 
+            speed: 50, 
+            x: this.player.x, 
+            y: this.player.y,
+            generation: 0
+        }, this.world));
     }
 
     endUsing(pointer: Vector2, direction: number) {
